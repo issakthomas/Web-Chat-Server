@@ -14,7 +14,7 @@ const port = process.env.PORT || 10000;
 app.use(
 	cors({
 		origin: [
-			"https://your-netlify-app.netlify.app",
+			"https://reactwebchatappbyissak.netlify.app",
 			"http://localhost:5173",
 		],
 		methods: ["GET", "POST"],
