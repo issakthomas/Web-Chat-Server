@@ -13,10 +13,7 @@ const port = process.env.PORT || 10000;
 
 app.use(
 	cors({
-		origin: [
-			"https://reactwebchatappbyissak.netlify.app",
-			// "http://localhost:5173",
-		],
+		origin: ["https://reactwebchatappbyissak.netlify.app"],
 		methods: ["GET", "POST"],
 	})
 );
@@ -28,10 +25,9 @@ app.get("/health", (req, res) => {
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
-const users = new Map(); // Map of username to ws connection
-const messageHistory = []; // Optional: Store messages if you wish
+const users = new Map();
+const messageHistory = [];
 
-// Broadcast function: sends data to every connected client
 function broadcast(data) {
 	const message = JSON.stringify(data);
 	wss.clients.forEach((client) => {
@@ -44,7 +40,6 @@ function broadcast(data) {
 wss.on("connection", (ws) => {
 	let username = "";
 
-	// Heartbeat: ping every 30 seconds
 	const heartbeat = setInterval(() => {
 		if (ws.readyState === ws.OPEN) {
 			ws.ping();
@@ -58,35 +53,28 @@ wss.on("connection", (ws) => {
 				case "JOIN":
 					username = data.username;
 					users.set(username, ws);
-					// Notify all clients that a new user has joined.
 					broadcast({
 						type: "USER_JOINED",
 						username,
 					});
-					// Send an updated users list to all clients.
 					broadcast({
 						type: "USERS",
 						users: Array.from(users.keys()),
 					});
-					// Optionally, send existing message history to the new user:
-					// ws.send(JSON.stringify({ type: "MESSAGE_HISTORY", messages: messageHistory }));
 					break;
 
 				case "MESSAGE":
-					// Create a message object and optionally store it.
 					const msg = {
 						type: "MESSAGE",
-						username,
-						text: data.text,
+						from: username,
+						content: data.content,
 						timestamp: new Date().toISOString(),
 					};
 					messageHistory.push(msg);
-					// Broadcast the message to all clients.
 					broadcast(msg);
 					break;
 
 				case "GET_USERS":
-					// Send the current user list to the requesting client.
 					ws.send(
 						JSON.stringify({
 							type: "USERS",
