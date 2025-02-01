@@ -13,7 +13,10 @@ const port = process.env.PORT || 10000;
 
 app.use(
 	cors({
-		origin: ["https://reactwebchatappbyissak.netlify.app"],
+		origin: [
+			"https://reactwebchatappbyissak.netlify.app",
+			"https://reactwebchatappbyissak.vercel.app",
+		],
 		methods: ["GET", "POST"],
 	})
 );
